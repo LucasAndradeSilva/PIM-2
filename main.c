@@ -20,7 +20,9 @@ enum textos_ascii_art{
     txtAgendamento = 11,
     txtReclamacao = 12,
     txtResultado = 13,
-    txtConsultaPacientes = 14
+    txtConsultaPacientes = 14,
+    txtCadastroMedico = 15,
+    txtListaMedico = 16
 } textos;
 
 enum caminhos_unidades{
@@ -122,8 +124,7 @@ static TFuncionario Funcionario;
 int main(){
     int finish = 0;
     do
-    {
-        system("color 7");  
+    {        
         system("cls");        
         
         finish = Menu();
@@ -142,29 +143,51 @@ int Menu(){
         ExibiTextos(txtInicio);
 
         int opcao;
-        printf("\n\n============= Digite 1 para o Login     ou    Digite 2 para Cadastro =============\n");   
+        printf("\n-----------------------------------------------------------------------------------------");
+        printf("\n-                                                                                       -");
+        printf("\n-           1 - Login                                                                   -");
+        printf("\n-           2 - Cadastro de Funcionario                                                 -");
+        printf("\n-           3 - Finalizar Programa                                                      -");
+        printf("\n-                                                                                       -");
+        printf("\n-----------------------------------------------------------------------------------------");
+        
         printf("\nOpcao: ");
         scanf("%d", &opcao);
 
-        if (opcao == 1)
-        {            
-            finish = Login();            
+        switch (opcao)
+        {
+            case 1:
+                finish = Login();            
 
-            if (finish == 1)            
-                 TelaInicial();
-            
+                if (finish == 1)            
+                    TelaInicial();
+                
+                break;
+
+            case 2:     
+                Cadastrar();            
+                finish = 1;
+                break;
+
+            case 3:
+                Logout();
+                finish = 1;
+                finish = 1;
+                break;
+
+            default:
+                system("cls");
+                system("color 4");
+                ExibiTextos(txtErro);                
+                printf("\n\nOpcao Invalida!\n\n");
+                system("pause");
+                system("color 7");
+                break;
         }
-        else if(opcao == 2)
-        {           
-            Cadastrar();            
-            finish = 1;
-        }
-        else
-            ExibiTextos(txtErro);
-        
+             
     } while (finish <= 0);
 
-    return 0;
+    return finish;
 }
 
 void TelaInicial(){
@@ -180,11 +203,12 @@ void TelaInicial(){
         printf("\n-                                                                                       -");
         printf("\n-           1 - Meus Dados                                                              -");
         printf("\n-           2 - Cadastrar Paciente                                                      -");
-        printf("\n-           3 - Agendar uma Consulta                                                    -");
-        printf("\n-           4 - Relatorios                                                              -");
-        printf("\n-           5 - Cadastrar uma Reclamacao                                                -");
-        printf("\n-           6 - Registrar um Cancelamento                                               -");
-        printf("\n-           7 - Sair                                                                    -");
+        printf("\n-           3 - Cadastrar Medico                                                        -");
+        printf("\n-           4 - Agendar uma Consulta                                                    -");
+        printf("\n-           5 - Relatorios                                                              -");
+        printf("\n-           6 - Cadastrar uma Reclamacao                                                -");
+        printf("\n-           7 - Cancelar uma Consulta                                                   -");
+        printf("\n-           8 - Sair                                                                    -");
         printf("\n-                                                                                       -");
         printf("\n-----------------------------------------------------------------------------------------");       
 
@@ -200,18 +224,21 @@ void TelaInicial(){
                 CadastrarPaciente();
                 break;
             case 3:
-                AgendarConsultas();
+                CadastrarMedico();
                 break;
             case 4:
-                Relatorios();
+                AgendarConsultas();
                 break;
             case 5:
-                Reclamacoes();
+                Relatorios();
                 break;
             case 6:
+                Reclamacoes();
+                break;
+            case 7:
                 //Cancelamento();
                 break;
-            case 7:            
+            case 8:            
                 Logout();
                 finish = 1;
                 break;
@@ -282,11 +309,6 @@ int Cadastrar(){
         system("color 7");  
         return 1;
     }
-
-    //Unidade
-    printf("\nDigite a sua Unidade: ");
-    scanf("%s", &funcionario.unidade);
-
 
     //Unidade
     printf("\nDigite a sua Unidade: ");
@@ -497,11 +519,12 @@ int Login(){
         
         if(arquivo == NULL)
         {
+            system("cls");
             system("color 4");                
             ExibiTextos(txtErro);
             printf("\nLogin Invalido!");
-            system("color 7");   
             system("pause");
+            system("color 7");   
             fclose(arquivo);              
         }
         else
@@ -608,7 +631,13 @@ void ExibiTextos(int typeTexto){
             LerArquivo("views/resultado.txt");                    
             break;
         case 14:            
-            LerArquivo("views/consultaPacientes.txt");                    
+            LerArquivo("views/consultaPacientes.txt"); 
+            break;
+        case 15:            
+            LerArquivo("views/cadastroMedico.txt");  
+            break;
+        case 16:            
+            LerArquivo("views/listaMedicos.txt");  
             break;
         default:
             break;
@@ -770,7 +799,79 @@ int Relatorios(){
                 break;
 
             case 6:
+                system("cls");
+                system("color 6");
+                ExibiTextos(txtListaMedico);
+
+                int qtdMedicos = 0;
+                                
+                FILE* arqMedicosCpfs = fopen("db/medicos/cpfsMedicos.txt", "rt");
                 
+                if(arqMedicosCpfs == NULL)
+                {
+                    system("color 4");   
+                    system("cls");
+                    ExibiTextos(txtErro);
+                    printf("\nErro ao gerar Relatorio!\n");
+                    system("pause");
+                    system("color 7");  
+                    finish = 0;
+                    break;
+                }                
+
+                for (int i = 1; !feof(arqMedicosCpfs); i++)
+                {
+                    char linha[100];
+                    char *result = fgets(linha, 100, arqMedicosCpfs);                           
+
+                    if (result && i > 1){                                    
+                        printf("\n%i. %s", (i-1) , linha);
+                        qtdMedicos++;
+                    }                                               
+                }
+
+                fclose(arqMedicosCpfs);  
+
+                printf("\n\nQuantidade de Medicos Cadastrdos: %i", qtdMedicos);
+                
+                char cpfSelecionado[255];
+                printf("\n\nDigite o CPF de um Medico ou Digite '0' para cancelar: ");
+                scanf("%s", &cpfSelecionado);
+
+                if (strcmp(cpfSelecionado, "0") == 0)
+                {
+                    system("color 7");
+                    break;    
+                }
+                else
+                {
+                    char arquivoMedico[255] = "db/medicos/";
+                    strcat(arquivoMedico, cpfSelecionado);
+                    strcat(arquivoMedico, ".txt");            
+
+                    FILE* arqMedico = fopen(arquivoMedico, "rt");
+                
+                    if(arqMedico == NULL)
+                    {
+                        system("color 4");   
+                        system("cls");
+                        ExibiTextos(txtErro);
+                        printf("\nMedico nao encontrado!\n\n");
+                        system("pause");
+                        system("color 7");  
+                        finish = 0;
+                        break;
+                    }                
+
+                    printf("\n\n=== DADOS DO MEDICO ===\n\n");
+                    LerArquivo(arquivoMedico);
+                    printf("\n\n");
+                    system("pause");    
+
+                    fclose(arqMedico);  
+                }
+                
+                system("color 7");                              
                 break;
 
             case 7:
@@ -779,7 +880,7 @@ int Relatorios(){
 
                 char cpfPaciente[255];
                 printf("\n\nInforme o CPF do Paciente que deseja consultar: ");
-                scanf("%s", cpfPaciente);
+                scanf("%s", &cpfPaciente);
                                                 
                 system("cls");
                 system("color 6");
@@ -790,12 +891,12 @@ int Relatorios(){
                 char dodosPacientes[255] = "db/pacientes/";                                
                 strcat(dodosPacientes, cpfPaciente);
                 strcat(dodosPacientes, ".txt");
-       
+                
                 LerArquivo(dodosPacientes);                
                 printf("\n\n");
 
                 //Ler Agendamentos
-                printf("\n\n === AGENDAMENTOS ===\n\n");
+                printf("\n\n=== AGENDAMENTOS ===\n\n");
                 char agendamentos[255] = "db/pacientes/agendamentos/";                                
                 strcat(agendamentos, cpfPaciente);
                 strcat(agendamentos, ".txt");
@@ -810,6 +911,24 @@ int Relatorios(){
                     LerArquivo(agendamentos);                
                     printf("\n\n");                    
                     fclose(arqAgendamentos);   
+                }
+                
+                //Ler Reclamações
+                printf("\n\n=== RECLOMACOES ===\n\n");
+                char reclamacoes[255] = "db/pacientes/reclamacoes/";                                
+                strcat(reclamacoes, cpfPaciente);
+                strcat(reclamacoes, ".txt");
+       
+                FILE* arqReclamacoes = fopen(reclamacoes, "rt");
+
+                if (arqReclamacoes == NULL)
+                {
+                    printf("PACIENTE NAO POSSUI RECLAMACOES\n\n");                    
+                }
+                else{
+                    LerArquivo(reclamacoes);                
+                    printf("\n\n");                    
+                    fclose(arqReclamacoes);   
                 }
                                 
                 system("pause");    
@@ -1008,5 +1127,113 @@ int Reclamacoes(){
         finish = 1; 
     } while (finish <= 0);
     
+    return 0;
+}
+
+int CadastrarMedico(){
+    system("cls");
+    ExibiTextos(txtCadastroMedico);    
+
+    TMedico medico;
+        
+    //Nome
+    printf("\n\nDigite o Nome: ");
+    gets(medico.nome);
+    scanf("%[^\n]s", &medico.nome);
+    setbuf(stdin, NULL);         
+
+    //CPF
+    printf("\nDigite o CPF: ");
+    scanf("%s", &medico.cpf);    
+
+    //Cria o Ponteiro
+    FILE *arquivo;     
+    
+    char nomeArquivo[200] = "db/medicos/";
+    strcat(nomeArquivo, medico.cpf);
+    strcat(nomeArquivo, ".txt");
+
+    arquivo = fopen(nomeArquivo, "w");
+        
+    if(arquivo == NULL)
+    {
+        system("color 4");                
+        ExibiTextos(txtErro);
+        printf("\nOcorreu um erro!");
+        system("color 7");  
+        return 1;
+    }
+
+    //Unidade
+    printf("\nDigite a Unidade: ");
+    scanf("%s", &medico.unidade);
+
+    //DDD
+    printf("\nDigite o DDD do Celular: ");
+    scanf("%s", &medico.ddd);
+
+    //Celular
+    printf("\nDigite o Celular: ");
+    scanf("%s", &medico.celular);
+
+    //RG
+    printf("\nDigite o RG: ");
+    scanf("%s", &medico.rg);  
+
+    //Endereço
+    printf("\nDigite o Endereco completo: ");
+    gets(medico.endereco);
+    scanf("%[^\n]s", &medico.endereco);
+    
+    //Nascimento
+    printf("\nDigite a data de nascimento: ");
+    scanf("%s", &medico.nascimento);
+    
+    //Status
+    strcpy(medico.status, "ativo");
+
+    //ID
+    strcpy(medico.id, GerarId());
+
+    //Escreve no txt    
+    fprintf(arquivo, "%s: <= Id ", medico.id);
+    fprintf(arquivo, "\n%s: <= Nome ", medico.nome);    
+    fprintf(arquivo, "\n%s: <= CPF", medico.cpf);
+    fprintf(arquivo, "\n%s: <= Status", medico.status);
+    fprintf(arquivo, "\n%s: <= Unidade", medico.unidade);
+    fprintf(arquivo, "\n%s: <= DDD", medico.ddd);
+    fprintf(arquivo, "\n%s: <= Celucar", medico.celular);
+    fprintf(arquivo, "\n%s: <= RG", medico.rg);    
+    fprintf(arquivo, "\n%s: <= Endereco", medico.endereco);
+    fprintf(arquivo, "\n%s: <= Nascimento", medico.nascimento);    
+
+    //Salva    
+    fclose(arquivo);
+
+    //Abre Arquivo de CPFS
+    char arquivoCpfs[255] = "db/medicos/cpfsMedicos.txt";
+    arquivo = fopen(arquivoCpfs, "w");
+        
+    if(arquivo == NULL)
+    {
+        system("color 4");                
+        ExibiTextos(txtErro);
+        printf("\nOcorreu um erro!");
+        system("color 7");  
+        return 1;
+    }
+
+    fprintf(arquivo, "\n%s: <= CPF - Nome => %s", medico.cpf, medico.nome);
+
+    //Salva    
+    fclose(arquivo);
+
+    system("cls");
+    system("color 2");
+    ExibiTextos(txtSucesso);    
+    printf("\n");
+    system("pause");
+    system("color 7");
+
     return 0;
 }

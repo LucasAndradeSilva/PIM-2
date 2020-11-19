@@ -1,0 +1,11 @@
+18112020: <= Data 
+1: <= Unidade
+Sei l : <= Instrucao
+0987654321: <= CPF do Paciente
+123456789: <= CPF do Funcionario
+32164989786: <= CPF do Medico
+37: <= Id Funcionario
+41: <= Id Paciente
+0: <= Id Medico
+40: <= Id Agendamento
+aberto: <= Status

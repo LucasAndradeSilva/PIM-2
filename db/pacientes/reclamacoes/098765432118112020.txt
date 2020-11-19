@@ -1,0 +1,4 @@
+18112020: <= Data 
+1: <= Unidade
+0987654321: <= CPF do Paciente
+jdanjcbkjbckjsbkjdabfkldvbiaudvbalf: <= Reclamacao
